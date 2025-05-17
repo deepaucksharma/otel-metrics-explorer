@@ -66,8 +66,6 @@ Comprehensive documentation is available in the `/docs` directory:
 
 ### Visual Design & Accessibility
 
-- [AA-DesignTokens.md](/docs/AA-DesignTokens.md): Design tokens and accessibility guidelines
-
 ## Getting Started
 
 Instructions for setting up the development environment and running the application will be added as the project progresses.

@@ -77,8 +77,6 @@ export function MetricCard({
             e.stopPropagation();
             handleToggleExpand();
           }}
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse metric details' : 'Expand metric details'}
         >
           {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
         </button>
