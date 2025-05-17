@@ -53,7 +53,6 @@ This `/docs` directory contains the complete system specification, broken down i
 | UI Layer (React/Vue Components) | 3X-ui- | Visual micro-components that render data and handle user interaction. |
 | Shared Utilities & Services | 4X- | Event bus, state store definitions, core utility functions. |
 | Supporting Documentation | 5X- | Sample payloads, testing strategy, performance budgets, roadmap, contributing. |
-| Visual Design & Accessibility | AA- | Design tokens, accessibility guidelines. |
 
 Start with `01-Architecture-Principles.md` to understand the foundational rules governing development. Each subsequent file details a specific micro-component or system aspect, including its responsibilities, public interface, dependencies, and error handling.
 

@@ -203,8 +203,6 @@ This phase is less about parallel tracks and more about concerted effort on qual
 
 | # | Ticket | Description | ⏱ | Depends |
 |---|--------|-------------|---|---------|
-| 6-1 | **a11y-audit-fixes** | Run accessibility audit (e.g., axe-core), fix violations (color contrast, ARIA attributes, keyboard nav) | 1.5 | M5 |
-| 6-2 | **perf-benchmarking-tuning** | Run Lighthouse CI, Vitest benchmarks against budgets; optimize critical paths, lazy-load workers/views | 1.5 | M5 |
 | 6-3 | **e2e-test-suite-expansion** | Add E2E tests for Cardinality Analyzer flow and Config Export | 1 | 5-9 |
 | 6-4 | **visual-regression-setup** | Integrate Percy/Chromatic for key components and views | 1 | M5 |
 | 6-5 | **user-docs-readme-gifs** | Create README quick-start, add GIF demos of key features | 1 | M5 |

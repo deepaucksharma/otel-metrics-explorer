@@ -63,36 +63,6 @@ Technologies:
 - Percy for visual regression testing (optional)
 - Custom test data fixtures
 
-### 2.4 Performance Tests
-
-Purpose: Ensure the application meets performance requirements.
-
-Characteristics:
-- Measure response times and rendering performance
-- Test with varied data volumes (small, medium, large)
-- Focus on critical user interactions
-- Establish performance baselines and budgets
-
-Technologies:
-- Lighthouse for overall performance metrics
-- Custom benchmarking tools for specific operations
-- React Profiler for component rendering performance
-- Chrome Performance API for detailed metrics
-
-### 2.5 Accessibility Tests
-
-Purpose: Ensure the application meets accessibility standards.
-
-Characteristics:
-- Automated checks for WCAG 2.1 AA compliance
-- Screen reader compatibility testing
-- Keyboard navigation testing
-- Color contrast and visual design validation
-
-Technologies:
-- axe-core for automated accessibility testing
-- Lighthouse for accessibility scoring
-- Manual testing with screen readers (NVDA, VoiceOver)
 
 ## 3. Test Organization
 
@@ -183,16 +153,12 @@ Technologies:
 3. **Unit Tests**: Run all unit tests
 4. **Integration Tests**: Run integration tests
 5. **E2E Tests**: Run critical path E2E tests
-6. **Performance Tests**: Run performance benchmarks (on scheduled basis)
-7. **Deploy**: Deploy to staging or production
+6. **Deploy**: Deploy to staging or production
 
 ### 6.2 Quality Gates
 
 - All tests must pass for promotion to production
 - Code coverage must not decrease
-- Performance metrics must not degrade beyond thresholds
-- Accessibility score must meet minimum requirements
-- No security vulnerabilities from dependency scanning
 
 ## 7. Test Environments
 
@@ -224,7 +190,6 @@ Technologies:
 - Mock Worker communication in unit tests
 - Use real Workers in integration tests
 - Test both with and without Worker support
-- Measure performance differences
 
 ### 8.2 Large Data Handling
 
@@ -238,7 +203,6 @@ Technologies:
 - Visual regression testing for charts and diagrams
 - Validation of data accuracy in visualizations
 - Testing of interactive visualization features
-- Accessibility testing for visual elements
 
 ## 9. Test Documentation
 
@@ -254,16 +218,13 @@ Each major feature should have a test plan documenting:
 
 CI system should generate:
 - Test coverage reports
-- Performance benchmark results
-- Accessibility compliance reports
 - Visual regression comparisons
 
 ## 10. Responsibilities
 
-- **Developers**: Unit tests, integration tests, performance tests
+ - **Developers**: Unit tests and integration tests
 - **QA Engineers**: E2E tests, exploratory testing, test planning
 - **DevOps**: CI pipeline, test environment maintenance
-- **Accessibility Experts**: Specialized accessibility testing
 
 ## 11. Implementation Timeline
 
@@ -276,13 +237,9 @@ CI system should generate:
 ### Phase 2: Component Test Coverage
 - Develop unit tests for all core components
 - Create integration tests for key features
-- Establish performance baselines
-- Implement basic accessibility testing
 
 ### Phase 3: Comprehensive Test Suite
 - Add E2E tests for critical user journeys
-- Expand performance testing
-- Complete accessibility compliance testing
 - Deploy automated visual regression testing
 
 ## 12. Success Metrics
@@ -290,8 +247,6 @@ CI system should generate:
 The testing strategy will be considered successful when:
 - Code coverage exceeds 80% across the codebase
 - All critical user journeys have automated tests
-- Performance benchmarks are stable and meet requirements
-- Accessibility compliance meets WCAG 2.1 AA standards
 - Release quality issues are reduced by 75% compared to baseline
 
 This testing strategy should be revisited quarterly to ensure it continues to meet the project's evolving needs.
