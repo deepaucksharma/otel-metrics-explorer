@@ -176,16 +176,14 @@ function processResources(
         const temporality = determineTemporality(metric, metricType);
         const monotonic = determineMonotonic(metric, metricType);
         
-        // Extract datapoints based on metric type
-        const dataPoints = extractDataPoints(metric, metricType, options.includeZeroValues);
-        
-        // Collect all unique attribute keys from datapoints
+        // Extract datapoints while collecting attribute keys
         const attributeKeysSet = new Set<string>();
-        dataPoints.forEach(dp => {
-          if (dp.attributes) {
-            Object.keys(dp.attributes).forEach(key => attributeKeysSet.add(key));
-          }
-        });
+        const dataPoints = extractDataPoints(
+          metric,
+          metricType,
+          options.includeZeroValues,
+          attributeKeysSet
+        );
         const attributeKeys = Array.from(attributeKeysSet);
         
         // Create parsed metric
@@ -224,7 +222,11 @@ function processResources(
 /**
  * Extract attributes from KeyValue array into a flat object
  */
-function extractAttributes(attributes: KeyValue[], normalize: boolean): Record<string, string | number | boolean> {
+function extractAttributes(
+  attributes: KeyValue[],
+  normalize: boolean,
+  attributeKeysSet?: Set<string>
+): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
   
   if (!attributes || !Array.isArray(attributes)) {
@@ -234,6 +236,7 @@ function extractAttributes(attributes: KeyValue[], normalize: boolean): Record<s
   attributes.forEach(attr => {
     const key = normalize ? normalizeAttributeKey(attr.key) : attr.key;
     const value = extractAttributeValue(attr.value, normalize);
+    if (attributeKeysSet) attributeKeysSet.add(key);
     
     if (value !== undefined) {
       result[key] = value;
@@ -290,7 +293,12 @@ function normalizeStringValue(value: string): string {
 /**
  * Extract data points based on metric type
  */
-function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boolean): any[] {
+function extractDataPoints(
+  metric: any,
+  type: MetricType,
+  includeZeroValues: boolean,
+  attributeKeysSet?: Set<string>
+): any[] {
   const dataPoints = [];
   
   if (type === 'gauge' && metric.gauge?.dataPoints) {
@@ -301,7 +309,7 @@ function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boo
       if (!includeZeroValues && value === 0) continue;
       
       dataPoints.push({
-        attributes: extractAttributes(dp.attributes, true),
+        attributes: extractAttributes(dp.attributes, true, attributeKeysSet),
         timeUnixNano: dp.timeUnixNano,
         startTimeUnixNano: dp.startTimeUnixNano,
         value
@@ -315,7 +323,7 @@ function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boo
       if (!includeZeroValues && value === 0) continue;
       
       dataPoints.push({
-        attributes: extractAttributes(dp.attributes, true),
+        attributes: extractAttributes(dp.attributes, true, attributeKeysSet),
         timeUnixNano: dp.timeUnixNano,
         startTimeUnixNano: dp.startTimeUnixNano,
         value
@@ -328,7 +336,7 @@ function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boo
       if (!includeZeroValues && count === 0) continue;
       
       dataPoints.push({
-        attributes: extractAttributes(dp.attributes, true),
+        attributes: extractAttributes(dp.attributes, true, attributeKeysSet),
         timeUnixNano: dp.timeUnixNano,
         startTimeUnixNano: dp.startTimeUnixNano,
         count,
@@ -344,7 +352,7 @@ function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boo
       if (!includeZeroValues && count === 0) continue;
       
       dataPoints.push({
-        attributes: extractAttributes(dp.attributes, true),
+        attributes: extractAttributes(dp.attributes, true, attributeKeysSet),
         timeUnixNano: dp.timeUnixNano,
         startTimeUnixNano: dp.startTimeUnixNano,
         count,
