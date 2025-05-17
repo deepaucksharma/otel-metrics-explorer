@@ -427,4 +427,6 @@ function computeMetricStatistics(parsedSnapshot: ParsedSnapshot): void {
   parsedSnapshot.totalSeries = totalSeries;
 }
 
+export { parseOtlpJson };
+
 export default {} as typeof Worker & { new(): Worker };
