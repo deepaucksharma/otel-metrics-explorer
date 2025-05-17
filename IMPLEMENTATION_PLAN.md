@@ -255,11 +255,11 @@ As of the current repository setup, we have completed:
 
 - ✅ **0-1 infra-repo-init**: Repository setup with git, initial React/Vite configuration
 - ✅ **0-2a contracts-core-structs**: Partial implementation of data contracts as TypeScript types
-- ✅ **0-3 bus-singleton**: Event bus service with types and basic logging 
+- ✅ **0-3 bus-singleton**: Event bus service with types and basic logging
 - ✅ **0-4a store-slices-def**: Slices and actions exist in the store
-- ⏳ **0-4b store-slices-impl-stubs**: Basic implementation started
+- ✅ **0-4b store-slices-impl-stubs**: Slice implementations wired with devtools
 - ✅ **0-5 ci-lint-unit-tests**: Basic CI workflow added
+- ✅ **0-6 storybook-setup**: Storybook configured for component development
 
 Next steps would be to:
-1. Complete the remaining Milestone 0 (M0) tasks
-2. Begin Track A and Track B work in parallel to reach Milestone 1
+1. Begin Track A and Track B work in parallel to reach Milestone 1
