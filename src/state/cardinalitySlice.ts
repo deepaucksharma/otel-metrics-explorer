@@ -19,7 +19,7 @@ export const createCardinalitySlice: StateCreator<
   [['zustand/immer', never], ['zustand/devtools', never]],
   [],
   CardinalitySlice
-> = () => ({
+> = (set, get) => ({
   cardinalityAnalysis: {},
   recommendations: {},
   costModel: {
