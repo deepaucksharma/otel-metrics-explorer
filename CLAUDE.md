@@ -130,3 +130,41 @@ src/
 - Node.js >= 16.x
 - pnpm >= 7.x
 - Git
+
+## Project Status and Known Issues
+
+The project is currently at Milestone 2 (M2). We've implemented the base UI components (SidebarNavigator, MetricsView, GaugeStatCard, DetailPanel) and the underlying state management system.
+
+### TypeScript Issues
+
+The project has several TypeScript typing issues, particularly:
+1. The DataPoint interface in `types/otlp.ts` needed a `value` property added to match actual implementation
+2. Metric type properties need to be properly typed as `MetricType` instead of `string`
+3. There are type mismatches between the original OTLP interfaces and the parsed internal representations
+
+When making changes, pay special attention to types and use type assertions (`as MetricType`) where needed.
+
+### Rendering Issues
+
+There are network/connectivity issues when trying to access the development server. We've created two static HTML alternatives:
+1. `sample-metrics.html`: A simple representation of the metrics cards
+2. `interactive-metrics.html`: A more interactive version with sidebar and detail panels
+
+### Error Handling
+
+We've added improved error handling throughout the application:
+1. Null/undefined value checks in formatting functions
+2. Empty array checks in data processing
+3. Try/catch blocks around potentially problematic code sections
+
+When adding new features, ensure robust error handling is in place, especially for:
+- Data access in store selectors
+- Type conversions and value formatting
+- Worker communication
+
+### Alternate Development Approaches
+
+If you encounter issues with the development server:
+1. Use the static HTML files for reference
+2. Build the project with `npx vite build` instead of using TypeScript checking
+3. Consider direct DOM manipulation for simpler demonstrations

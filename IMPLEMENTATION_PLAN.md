@@ -253,13 +253,54 @@ checked by CI contract tests.
 
 As of the current repository setup, we have completed:
 
+### Phase 0 - Bootstrap
 - ✅ **0-1 infra-repo-init**: Repository setup with git, initial React/Vite configuration
 - ✅ **0-2a contracts-core-structs**: Partial implementation of data contracts as TypeScript types
+- ✅ **0-2b contracts-derived-stores**: Implemented MetricDefinition interfaces
 - ✅ **0-3 bus-singleton**: Event bus service with types and basic logging 
 - ✅ **0-4a store-slices-def**: Slices and actions exist in the store
-- ⏳ **0-4b store-slices-impl-stubs**: Basic implementation started
+- ✅ **0-4b store-slices-impl-stubs**: Implementation completed for all slices
 - ✅ **0-5 ci-lint-unit-tests**: Basic CI workflow added
+- ✅ **0-6 storybook-setup**: Storybook configuration completed
+
+### Phase 1 - "Hello Metrics"
+- ✅ **1-3a layout-shell-structure**: AppLayout structure with placeholders
+- ✅ **1-3b layout-shell-routing-stub**: Basic React Router setup
+- ✅ **1-4a sidebar-ui-structure**: SidebarNavigator visual structure
+- ✅ **1-4b sidebar-events-emit**: Event emission from sidebar
+- ✅ **1-5a gauge-card-structure**: GaugeStatCard visual structure
+- ✅ **1-5b gauge-card-inspect-event**: Inspect event on click
+- ✅ **1-6 metrics-view-placeholder**: Basic MetricsView component
+
+### Phase 2 - Parsing & Gauge Display
+- ✅ **2-1a worker-attr-flatten-util**: Utility for flattening attributes
+- ✅ **2-1b worker-serieskey-impl**: Series key generation implementation
+- ✅ **2-2a metricsSlice-setSnapA-def**: MetricsSlice action definitions
+- ✅ **2-2b metricsSlice-metricDefs-util**: Utility for metric definitions
+- ✅ **2-2c metricsSlice-setSnapA-impl**: Implementation of snapshot handling
+- ✅ **2-3a sidebar-list-selector**: Selectors for metric lists
+- ✅ **2-3b sidebar-list-render**: Rendering metrics in sidebar
+- ✅ **2-4a metrics-view-layout**: Grid layout for cards
+- ✅ **2-4b metrics-view-map-defs**: Mapping definitions to cards
+- ✅ **2-5a gauge-card-data-selector**: Data selectors for gauge cards
+- ✅ **2-5b gauge-card-render-real**: Real data rendering in gauge cards
+- ✅ **2-6 detail-panel-ui-shell**: Detail panel UI structure
+- ✅ **2-7 detail-panel-schema-view-stub**: Schema tab for detail panel
+
+### Phase 3 - Diff Engine & Rate Cards
+- ✅ **3-1a diff-engine-core-logic**: Implemented computeDiffs core logic
+- ✅ **3-1b diff-engine-tests**: Added comprehensive unit tests for computeDiffs
+- ✅ **3-2a diffSlice-def**: Defined DiffSlice state shape and actions
+- ✅ **3-2b diffRunner-impl**: Implemented diffRunner to process snapshots and update store
+- ✅ **3-3a rate-card-structure**: Created RateDeltaCard component with proper visualization
+- ✅ **3-3b rate-card-reset-display**: Added support for counter reset detection
+- ✅ **3-4a rate-card-data-selector**: Implemented selectors for accessing diff data
+- ✅ **3-4b rate-card-render-real**: Integrated selectors to display real diff/rate data
+- ✅ **3-5 metrics-view-choose-card**: Added logic to choose between RateDeltaCard and GaugeStatCard
+
+Current Status: We have completed Phases 0, 1, 2, and 3, reaching milestone M3. The application now handles two snapshots, computes diffs between them, and displays delta/rate cards with counter reset detection. We've implemented error handling throughout the application, added a sample data loading mechanism, and provided static HTML alternatives for easier demonstration.
 
 Next steps would be to:
-1. Complete the remaining Milestone 0 (M0) tasks
-2. Begin Track A and Track B work in parallel to reach Milestone 1
+1. Implement the Cardinality Analyzer (Phase 4)
+2. Address TypeScript errors and improve test coverage
+3. Create more comprehensive documentation for the implemented features

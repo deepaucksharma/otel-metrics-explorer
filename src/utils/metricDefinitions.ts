@@ -49,14 +49,18 @@ export function buildMetricDefinitionsFromSnapshots(
 function createDefinitionFromMetric(metric: ParsedMetric): MetricDefinition {
   // Count unique series by collecting unique series keys
   const seriesKeys = new Set<string>();
-  metric.dataPoints.forEach(dp => {
-    if (dp.seriesKey) seriesKeys.add(dp.seriesKey);
-  });
+  if (Array.isArray(metric.dataPoints)) {
+    metric.dataPoints.forEach(dp => {
+      if (dp && dp.seriesKey) seriesKeys.add(dp.seriesKey);
+    });
+  }
   
   // Calculate simple statistics for numeric values
-  const values = metric.dataPoints
-    .map(dp => (dp.value !== undefined ? dp.value : null))
-    .filter((v): v is number => v !== null);
+  const values = Array.isArray(metric.dataPoints) 
+    ? metric.dataPoints
+      .map(dp => (dp && typeof dp.value === 'number' ? dp.value : null))
+      .filter((v): v is number => v !== null)
+    : [];
   
   const stats = calculateStatistics(values);
   
@@ -68,8 +72,8 @@ function createDefinitionFromMetric(metric: ParsedMetric): MetricDefinition {
     type: metric.type,
     temporality: metric.temporality,
     monotonic: metric.monotonic,
-    attributeKeys: [...metric.attributeKeys],
-    dataPointCount: metric.dataPoints.length,
+    attributeKeys: Array.isArray(metric.attributeKeys) ? [...metric.attributeKeys] : [],
+    dataPointCount: Array.isArray(metric.dataPoints) ? metric.dataPoints.length : 0,
     seriesCount: seriesKeys.size,
     ...stats
   };
@@ -83,56 +87,60 @@ function updateDefinitionFromMetric(
   metric: ParsedMetric
 ): void {
   // Add any new attribute keys
-  metric.attributeKeys.forEach(key => {
-    if (!definition.attributeKeys.includes(key)) {
-      definition.attributeKeys.push(key);
-    }
-  });
+  if (Array.isArray(metric.attributeKeys)) {
+    metric.attributeKeys.forEach(key => {
+      if (!definition.attributeKeys.includes(key)) {
+        definition.attributeKeys.push(key);
+      }
+    });
+  }
   
   // Update count of data points
-  definition.dataPointCount += metric.dataPoints.length;
-  
-  // Count new unique series by collecting unique series keys
-  const seriesKeys = new Set<string>();
-  metric.dataPoints.forEach(dp => {
-    if (dp.seriesKey) seriesKeys.add(dp.seriesKey);
-  });
-  definition.seriesCount += seriesKeys.size;
-  
-  // Update statistics
-  const values = metric.dataPoints
-    .map(dp => (dp.value !== undefined ? dp.value : null))
-    .filter((v): v is number => v !== null);
-  
-  if (values.length > 0) {
-    const newStats = calculateStatistics(values);
+  if (Array.isArray(metric.dataPoints)) {
+    definition.dataPointCount += metric.dataPoints.length;
     
-    // Update min/max
-    if (newStats.minValue !== undefined) {
-      definition.minValue = definition.minValue !== undefined
-        ? Math.min(definition.minValue, newStats.minValue)
-        : newStats.minValue;
-    }
+    // Count new unique series by collecting unique series keys
+    const seriesKeys = new Set<string>();
+    metric.dataPoints.forEach(dp => {
+      if (dp && dp.seriesKey) seriesKeys.add(dp.seriesKey);
+    });
+    definition.seriesCount += seriesKeys.size;
     
-    if (newStats.maxValue !== undefined) {
-      definition.maxValue = definition.maxValue !== undefined
-        ? Math.max(definition.maxValue, newStats.maxValue)
-        : newStats.maxValue;
-    }
+    // Update statistics
+    const values = metric.dataPoints
+      .map(dp => (dp && typeof dp.value === 'number' ? dp.value : null))
+      .filter((v): v is number => v !== null);
     
-    // For avg, we'd need to properly weight the values, but this is a simple implementation
-    if (newStats.avgValue !== undefined) {
-      if (definition.avgValue !== undefined) {
-        definition.avgValue = (definition.avgValue + newStats.avgValue) / 2;
-      } else {
-        definition.avgValue = newStats.avgValue;
+    if (values.length > 0) {
+      const newStats = calculateStatistics(values);
+      
+      // Update min/max
+      if (newStats.minValue !== undefined) {
+        definition.minValue = definition.minValue !== undefined
+          ? Math.min(definition.minValue, newStats.minValue)
+          : newStats.minValue;
       }
-    }
-    
-    // Update last value if this metric's timestamp is more recent
-    // In a real implementation, we'd compare timestamps
-    if (newStats.lastValue !== undefined) {
-      definition.lastValue = newStats.lastValue;
+      
+      if (newStats.maxValue !== undefined) {
+        definition.maxValue = definition.maxValue !== undefined
+          ? Math.max(definition.maxValue, newStats.maxValue)
+          : newStats.maxValue;
+      }
+      
+      // For avg, we'd need to properly weight the values, but this is a simple implementation
+      if (newStats.avgValue !== undefined) {
+        if (definition.avgValue !== undefined) {
+          definition.avgValue = (definition.avgValue + newStats.avgValue) / 2;
+        } else {
+          definition.avgValue = newStats.avgValue;
+        }
+      }
+      
+      // Update last value if this metric's timestamp is more recent
+      // In a real implementation, we'd compare timestamps
+      if (newStats.lastValue !== undefined) {
+        definition.lastValue = newStats.lastValue;
+      }
     }
   }
 }

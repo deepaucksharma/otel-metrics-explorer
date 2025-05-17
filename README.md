@@ -98,7 +98,28 @@ pnpm install
 pnpm dev
 ```
 
-The app will be available at `http://localhost:5173`
+The app will be available at `http://localhost:3000`
+
+### Alternative Static Views
+
+If you encounter issues running the development server, we provide static HTML versions of the application:
+
+- **sample-metrics.html**: A simplified view showing sample metric cards with proper formatting
+- **interactive-metrics.html**: A more complete version with interactive elements (sidebar, filtering, detail panel)
+
+You can open these HTML files directly in your browser without needing a server.
+
+### Project Status
+
+The project is currently at Milestone 2 (M2), with the following key components implemented:
+
+- SidebarNavigator with filtering and search functionality
+- MetricsView with GaugeStatCard components for displaying metrics
+- DetailPanel for showing in-depth metric information
+- Data parsing and metric definition utilities
+- Event bus for inter-component communication
+
+See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for more detailed progress information.
 
 See [61-installation-Deployment.md](/docs/61-installation-Deployment.md) for detailed setup instructions.
 

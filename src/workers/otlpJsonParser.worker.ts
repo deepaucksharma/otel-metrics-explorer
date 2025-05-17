@@ -226,7 +226,7 @@ function processResources(
 /**
  * Extract attributes from KeyValue array into a flat object
  */
-function extractAttributes(attributes: KeyValue[], normalize: boolean): Record<string, string | number | boolean> {
+function extractAttributes(attributes: any[], normalize: boolean): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
   
   if (!attributes || !Array.isArray(attributes)) {

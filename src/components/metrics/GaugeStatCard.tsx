@@ -42,7 +42,9 @@ export function GaugeStatCard({
     // For most precise results, we would sort by timeUnixNano, but for simplicity
     // we'll assume the last datapoint in the array is the most recent
     const latestDataPoint = dataPoints[dataPoints.length - 1];
-    return latestDataPoint.value;
+    
+    // Ensure we have a valid value
+    return typeof latestDataPoint?.value === 'number' ? latestDataPoint.value : null;
   });
   
   if (!metric) {
@@ -128,7 +130,7 @@ export function GaugeStatCard({
 
 // Helper to format value based on unit
 function formatValue(value: number | null, unit?: string): string {
-  if (value === null) return 'N/A';
+  if (value === null || value === undefined) return 'N/A';
   
   // Format based on unit type
   if (unit) {

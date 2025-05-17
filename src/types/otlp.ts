@@ -74,11 +74,12 @@ export interface SummaryMetric {
 }
 
 export interface DataPoint {
-  attributes: KeyValue[];
+  attributes: KeyValue[] | Record<string, string | number | boolean>;
   timeUnixNano: string;
   startTimeUnixNano?: string;
   asDouble?: number;
   asInt?: string;
+  value?: number; // Add value field for parsed data points
   seriesKey?: string;
 }
 

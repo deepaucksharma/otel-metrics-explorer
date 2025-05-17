@@ -32,12 +32,17 @@ export function MetricsView() {
   }, [setSelectedMetric]);
   
   const metrics = useStore(state => {
-    if (!state.uiState.selectedSnapshotId) return [];
-    
-    const snapshot = state.snapshots[state.uiState.selectedSnapshotId];
-    if (!snapshot) return [];
-    
-    return Object.values(snapshot.metrics);
+    try {
+      if (!state.uiState.selectedSnapshotId) return [];
+      
+      const snapshot = state.snapshots[state.uiState.selectedSnapshotId];
+      if (!snapshot || !snapshot.metrics) return [];
+      
+      return Object.values(snapshot.metrics);
+    } catch (error) {
+      console.error("Error getting metrics:", error);
+      return [];
+    }
   });
   
   // Apply filters and sort
@@ -103,10 +108,23 @@ export function MetricsView() {
     );
   }
   
+  // Get diff store info to see if we have diff data
+  const hasDiffData = useStore(state => !!state.diffStore?.currentDiff);
+  
   // Render the grid or list based on view mode
   return (
     <div className="flex h-full">
       <div className="flex-1 p-4 overflow-y-auto">
+        {/* Display mode indicator (Gauge vs Rate) */}
+        {hasDiffData && (
+          <div className="mb-4 px-3 py-2 bg-green-100 dark:bg-green-900 rounded-md text-green-800 dark:text-green-200 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span>Showing rate and delta metrics between snapshots</span>
+          </div>
+        )}
+      
         <div 
           className={
             viewMode === 'grid' 
@@ -114,15 +132,37 @@ export function MetricsView() {
               : 'space-y-4'
           }
         >
-          {filteredMetrics.map(metric => (
-            <div key={metric.id}>
-              <GaugeStatCard
-                metricId={metric.id}
-                snapshotId={selectedSnapshotId}
-                compact={viewMode === 'list'}
-              />
-            </div>
-          ))}
+          {filteredMetrics.map(metric => {
+            // If we have diff data and this is a gauge or monotonic sum, 
+            // show a RateDeltaCard instead of a GaugeStatCard
+            const shouldShowRateCard = hasDiffData && 
+              (metric.type === 'gauge' || (metric.type === 'sum' && metric.monotonic));
+            
+            if (shouldShowRateCard) {
+              // Import dynamically to avoid circular dependencies
+              const { RateDeltaCard } = require('./RateDeltaCard');
+              
+              return (
+                <div key={metric.id}>
+                  <RateDeltaCard
+                    metricName={metric.name}
+                    compact={viewMode === 'list'}
+                  />
+                </div>
+              );
+            }
+            
+            // Otherwise, show a regular GaugeStatCard
+            return (
+              <div key={metric.id}>
+                <GaugeStatCard
+                  metricId={metric.id}
+                  snapshotId={selectedSnapshotId}
+                  compact={viewMode === 'list'}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
       
