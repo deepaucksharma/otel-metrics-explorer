@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { eventBus } from '../../services/eventBus';
 import { useStore } from '../../services/stateStore';
-import { ParsedSnapshot } from '../../types/otlp';
+import { ParsedSnapshot } from '../../contracts/otlp';
 
 // Import worker as a module
 // In a real implementation, this would use proper worker loader and TypeScript worker setup

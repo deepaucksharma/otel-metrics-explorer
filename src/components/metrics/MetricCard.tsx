@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../services/stateStore';
-import { ParsedMetric, MetricType } from '../../types/otlp';
+import { ParsedMetric, MetricType } from '../../contracts/otlp';
 
 interface MetricCardProps {
   metricId: string;

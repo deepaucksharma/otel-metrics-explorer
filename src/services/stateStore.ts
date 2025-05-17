@@ -6,7 +6,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { devtools } from 'zustand/middleware';
-import { ParsedSnapshot, ParsedMetric } from '../types/otlp';
+import { ParsedSnapshot, ParsedMetric } from '../contracts/otlp';
 
 export interface AppState {
   // Snapshots

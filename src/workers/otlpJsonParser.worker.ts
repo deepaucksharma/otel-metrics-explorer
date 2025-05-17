@@ -5,7 +5,7 @@
  * to avoid blocking the UI during processing of large datasets.
  */
 
-import { OtlpMetricsJson, ParsedSnapshot, MetricType, Temporality } from '../types/otlp';
+import { OtlpMetricsJson, ParsedSnapshot, MetricType, Temporality } from '../contracts/otlp';
 
 // Define the message types for Worker communication
 interface WorkerMessage {
