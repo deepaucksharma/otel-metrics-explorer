@@ -37,32 +37,32 @@ Comprehensive documentation is available in the `/docs` directory:
 
 - [00-Overview.md](/docs/00-Overview.md): Main entry point for understanding the specification
 - [01-Architecture-Principles.md](/docs/01-Architecture-Principles.md): Foundational architecture principles
-- [02-Data-Contracts.md](/docs/02-Data-Contracts.md): Core data structures and type definitions
+- [02-Dependency-Graph.md](/docs/02-Dependency-Graph.md): Single-page overview of allowed import flow
 
 ### Data Provider Layer
 
 - [10-data-StaticFileProvider.md](/docs/10-data-StaticFileProvider.md): Loading OTLP data from static files
-- [11-data-LiveStreamProvider.md](/docs/11-data-LiveStreamProvider.md): Connecting to live OTLP data sources
+- [11-data-LiveWsProvider.md](/docs/11-data-LiveWsProvider.md): Connecting to live OTLP data sources
 
 ### Logic Layer
 
-- [20-logic-OtlpJsonParser.md](/docs/20-logic-OtlpJsonParser.md): Parsing OTLP JSON data
-- [21-logic-CardinalityAnalysisEngine.md](/docs/21-logic-CardinalityAnalysisEngine.md): Analyzing metric cardinality
+- [20-logic-ParserWorker.md](/docs/20-logic-ParserWorker.md): Worker that transforms raw OTLP JSON into typed snapshots
+- [22-logic-CardinalityEngine.md](/docs/22-logic-CardinalityEngine.md): Set math engine for series and label counts
 
 ### UI Layer
 
-- [30-ui-MetricCard.md](/docs/30-ui-MetricCard.md): Core component for displaying metric data
-- [31-ui-CardinalityAnalysisView.md](/docs/31-ui-CardinalityAnalysisView.md): UI for cardinality analysis
+- [32-ui-GaugeStatCard.md](/docs/32-ui-GaugeStatCard.md): Gauge-style statistic card
+- [35-ui-CardinalityOverview.md](/docs/35-ui-CardinalityOverview.md): Cardinality Analyzer overview
 
 ### Shared Utilities
 
-- [40-EventBusService.md](/docs/40-EventBusService.md): Decoupled component communication
-- [41-StateManagementService.md](/docs/41-StateManagementService.md): Centralized state management
+- [40-event-Bus.md](/docs/40-event-Bus.md): Global publish-subscribe hub
+- [41-state-StoreSlices.md](/docs/41-state-StoreSlices.md): Zustand store slices
 
 ### Supporting Documentation
 
-- [50-SamplePayloads.md](/docs/50-SamplePayloads.md): Example OTLP JSON payloads
-- [51-TestingStrategy.md](/docs/51-TestingStrategy.md): Testing approach and methodology
+- [50-sample-Payloads.md](/docs/50-sample-Payloads.md): Example OTLP JSON payloads
+- [51-testing-Strategy.md](/docs/51-testing-Strategy.md): Testing approach and methodology
 
 ### Visual Design & Accessibility
 
