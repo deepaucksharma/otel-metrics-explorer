@@ -1,19 +1,47 @@
 interface EmptyStateProps {
   title: string;
-  description: string;
-  icon?: 'chart' | 'file' | 'data';
+  description?: string;
+  icon?: 'chart' | 'file' | 'data' | string;
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
-export function EmptyState({ title, description, icon = 'data' }: EmptyStateProps) {
+export function EmptyState({ 
+  title, 
+  description, 
+  icon = 'data', 
+  actionLabel,
+  onAction
+}: EmptyStateProps) {
+  // Determine if icon is a string emoji or a predefined icon type
+  const isEmojiIcon = icon && !['chart', 'file', 'data'].includes(icon);
+  
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
-      <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-100 flex items-center justify-center mb-4">
-        {icon === 'chart' && <ChartIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
-        {icon === 'file' && <FileIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
-        {icon === 'data' && <DataIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
-      </div>
+      {isEmojiIcon ? (
+        <div className="text-4xl mb-4">{icon}</div>
+      ) : (
+        <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-100 flex items-center justify-center mb-4">
+          {icon === 'chart' && <ChartIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
+          {icon === 'file' && <FileIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
+          {icon === 'data' && <DataIcon className="w-10 h-10 text-primary-600 dark:text-primary-600" />}
+        </div>
+      )}
+      
       <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">{title}</h2>
-      <p className="text-neutral-600 dark:text-neutral-400 text-center max-w-md">{description}</p>
+      
+      {description && (
+        <p className="text-neutral-600 dark:text-neutral-400 text-center max-w-md mb-4">{description}</p>
+      )}
+      
+      {actionLabel && onAction && (
+        <button
+          onClick={onAction}
+          className="mt-2 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded"
+        >
+          {actionLabel}
+        </button>
+      )}
     </div>
   );
 }
