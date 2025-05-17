@@ -49,7 +49,21 @@ export function SnapshotUploader({ onSnapshotLoaded }: SnapshotUploaderProps) {
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !worker) return;
-    
+
+    const maxSizeStr = import.meta.env.VITE_MAX_FILE_SIZE;
+    const maxSize = maxSizeStr ? parseInt(maxSizeStr, 10) : undefined;
+    if (maxSize && file.size > maxSize) {
+      const message = `File size exceeds limit of ${maxSize} bytes`;
+      setError(message);
+      eventBus.emit('snapshot.error', {
+        fileName: file.name,
+        error: message,
+        timestamp: Date.now()
+      });
+      e.target.value = '';
+      return;
+    }
+
     // Reset states
     setIsLoading(true);
     setError(null);
