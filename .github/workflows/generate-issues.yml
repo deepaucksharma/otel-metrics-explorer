@@ -17,6 +17,12 @@ on:
         - '5'
         - '6'
 
+# Request necessary permissions
+permissions:
+  issues: write
+  repository-projects: write
+  contents: read
+  
 jobs:
   generate-issues:
     runs-on: ubuntu-latest
@@ -35,7 +41,17 @@ jobs:
           run_install: false
       
       - name: Install dependencies
-        run: pnpm install @octokit/rest
+        run: pnpm install --no-frozen-lockfile @octokit/rest
+      
+      - name: Debug Implementation Plan structure
+        run: |
+          echo "Implementation Plan Content Preview:"
+          head -n 50 docs/72-implementation-Plan.md
+          echo "..."
+          grep -n "Phase 0" docs/72-implementation-Plan.md || echo "No matches for Phase 0"
+          grep -n "### Phase" docs/72-implementation-Plan.md || echo "No matches for ### Phase"
       
       - name: Generate issues
         run: node scripts/generate-issues.js ${{ github.event.inputs.phase }} ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

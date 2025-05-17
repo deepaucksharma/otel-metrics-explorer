@@ -48,18 +48,36 @@ async function main() {
     const tasks = extractTasksForPhase(implementationPlan, phaseNumber);
     console.log(`Found ${tasks.length} tasks`);
     
-    // Create milestone if it doesn't exist
-    const milestone = await getOrCreateMilestone(phaseNumber);
-    
-    // Create issues
-    for (const task of tasks) {
-      await createIssue(task, milestone.number);
-      console.log(`Created issue for ${task.id}: ${task.description}`);
+    if (tasks.length === 0) {
+      console.error("No tasks found. Check implementation plan format.");
+      process.exit(1);
     }
     
-    console.log('Done!');
+    // Create milestone if it doesn't exist
+    let milestone;
+    try {
+      milestone = await getOrCreateMilestone(phaseNumber);
+    } catch (error) {
+      console.error("Failed to create milestone. Using null milestone.");
+      milestone = { number: null };
+    }
+    
+    // Create issues
+    let createdCount = 0;
+    for (const task of tasks) {
+      try {
+        await createIssue(task, milestone.number);
+        console.log(`Created issue for ${task.id}: ${task.description}`);
+        createdCount++;
+      } catch (error) {
+        console.error(`Failed to create issue for ${task.id}: ${error.message}`);
+      }
+    }
+    
+    console.log(`Done! Created ${createdCount} issues.`);
   } catch (error) {
     console.error('Error:', error.message);
+    process.exit(1);
   }
 }
 
@@ -68,45 +86,52 @@ function extractTasksForPhase(plan, phase) {
   const tasks = [];
   
   // Find the phase section
-  const phaseSectionRegex = new RegExp(`### Phase ${phase}[^#]*`, 'g');
+  // Match any header containing "Phase X" where X is our phase number
+  const phaseSectionRegex = new RegExp(`### Phase ${phase}[^#]*?(?=###|$)`, 'gs');
   const phaseMatch = plan.match(phaseSectionRegex);
   
   if (!phaseMatch) {
-    console.error(`Phase ${phase} not found in implementation plan`);
-    return tasks;
+    // Try alternate format that might be used
+    const altRegex = new RegExp(`## \\d+\\. Phase ${phase}[^#]*?(?=##|$)`, 'gs');
+    const altMatch = plan.match(altRegex);
+    
+    if (!altMatch) {
+      console.error(`Phase ${phase} not found in implementation plan. Scanning entire document...`);
+      // If we can't find the section, just scan the whole document for tasks with IDs starting with the phase number
+      const taskRegex = new RegExp(`\\| (${phase}-[0-9]+[a-z]) \\| ([^|]+) \\| ([^|]+) \\| ([0-9.]+d) \\| ([^|]*) \\|`, 'g');
+      let match;
+      
+      while ((match = taskRegex.exec(plan)) !== null) {
+        const [, id, ticket, description, duration, dependencies] = match;
+        
+        tasks.push({
+          id,
+          ticket: ticket.trim(),
+          description: description.trim(),
+          duration: duration.trim(),
+          dependencies: dependencies.trim(),
+          track: determineTrack(id),
+          isInterface: isInterfaceTask(id, ticket),
+          phase
+        });
+      }
+      
+      return tasks;
+    }
+    
+    return extractTasksFromContent(altMatch[0], phase);
   }
   
-  const phaseContent = phaseMatch[0];
-  
-  // Parse the tasks tables
+  return extractTasksFromContent(phaseMatch[0], phase);
+}
+
+function extractTasksFromContent(content, phase) {
+  const tasks = [];
   const tableRegex = /\| ([0-9]+-[0-9]+[a-z]) \| ([^|]+) \| ([^|]+) \| ([0-9.]+d) \| ([^|]*) \|/g;
   let match;
   
-  while ((match = tableRegex.exec(phaseContent)) !== null) {
+  while ((match = tableRegex.exec(content)) !== null) {
     const [, id, ticket, description, duration, dependencies] = match;
-    
-    // Determine the track
-    let track = 'unknown';
-    if (id.includes('-')) {
-      // Extract track from section headings or ID prefix
-      const trackMatch = phaseContent.match(/#### Track ([A-Z]) — (.*)/);
-      if (trackMatch) {
-        track = trackMatch[1];
-      } else {
-        // Try to infer from ID
-        const prefix = id.split('-')[0];
-        switch (prefix) {
-          case '1': track = 'A'; break;
-          case '2': track = 'B'; break;
-          case '3': track = 'C'; break;
-          case '4': track = 'D'; break;
-          case '5': track = 'E'; break;
-        }
-      }
-    }
-    
-    // Determine if this is an interface task
-    const isInterface = id.endsWith('a') && (ticket.includes('iface') || ticket.includes('def'));
     
     tasks.push({
       id,
@@ -114,13 +139,64 @@ function extractTasksForPhase(plan, phase) {
       description: description.trim(),
       duration: duration.trim(),
       dependencies: dependencies.trim(),
-      track,
-      isInterface,
+      track: determineTrackFromContent(content, id),
+      isInterface: isInterfaceTask(id, ticket),
       phase
     });
   }
   
   return tasks;
+}
+
+function determineTrackFromContent(content, id) {
+  // Try to find the track from section headers
+  const section = findSectionForId(content, id);
+  if (section) {
+    const trackMatch = section.match(/#### Track ([A-Z])/);
+    if (trackMatch) {
+      return trackMatch[1];
+    }
+  }
+  
+  return determineTrack(id);
+}
+
+function findSectionForId(content, id) {
+  // Split content by track headers
+  const sections = content.split(/#### Track [A-Z]/);
+  
+  // Check each section for the ID
+  for (let i = 1; i < sections.length; i++) {
+    if (sections[i].includes(id)) {
+      return "#### Track " + sections[i];
+    }
+  }
+  
+  return null;
+}
+
+function determineTrack(id) {
+  // Try to infer from ID prefix
+  const prefix = id.split('-')[0];
+  switch (prefix[0]) {
+    case '0': return 'Foundation';
+    case '1': return 'A';
+    case '2': return 'B';
+    case '3': return 'C';
+    case '4': return 'D';
+    case '5': return 'E';
+    case '6': return 'F';
+    default: return 'Unknown';
+  }
+}
+
+function isInterfaceTask(id, ticket) {
+  return id.endsWith('a') && (
+    ticket.includes('iface') || 
+    ticket.includes('def') || 
+    ticket.includes('interface') || 
+    ticket.includes('api')
+  );
 }
 
 // Get or create milestone
