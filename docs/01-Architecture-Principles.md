@@ -1,90 +1,138 @@
-# Architecture Principles
+# 01 · Architecture Principles
 
-This document outlines the foundational architectural principles that govern the development of the OTLP Process Metrics Explorer.
+This document is the **constitution** for every line of code in the OTLP Process Metrics Explorer.
+All micro-components, PRs, and design decisions **MUST** conform to these rules.
 
-## 1. Micro-Component Architecture
+---
 
-The OTLP Process Metrics Explorer follows a micro-component architecture, which promotes:
+## 1. Single-Responsibility Micro-Components
 
-- **High Cohesion, Low Coupling**: Each component has a single, well-defined responsibility and minimal dependencies.
-- **Testability**: Components are designed to be easily testable in isolation.
-- **Reusability**: Components can be repurposed or extended for similar use cases.
-- **Maintainability**: Small, focused components are easier to understand and modify.
+* Each file implements **exactly one concern** (UI tile, algorithm, or adapter).
+* UI micro-components **must not** perform data parsing or heavy math.
+* Logic micro-components **must not** render DOM or import React.
+* Data providers **must not** know about UI state; they only emit `snapshot` events.
 
-## 2. Separation of Concerns
+> **Checklist for reviewers:**  
+> - Does the file do more than one thing?  
+> - Does it import across layers (e.g. UI ↔ logic)?  
+> If yes, request split / refactor.
 
-The system is divided into distinct layers:
+---
 
-- **Data Provider Layer**: Responsible for obtaining OTLP data from various sources.
-- **Logic Layer**: Handles data processing, analysis, and transformation.
-- **UI Layer**: Presents information to users and manages interactions.
-- **Shared Services**: Provides cross-cutting functionality used by multiple components.
+## 2. Explicit Public Interfaces
 
-## 3. Event-Driven Communication
+Every `*-*.md` spec file defines:
 
-Components communicate primarily through an event bus, which:
+| Section          | Must include                        |
+|------------------|-------------------------------------|
+| **Responsibility** | One-sentence purpose               |
+| **Inputs / Props** | Exact types & formats              |
+| **Events / Outputs** | EventBus names or return types   |
+| **Dependencies** | Internal libs or slices it imports  |
+| **Upstream Consumers** | Who calls / renders it         |
 
-- Decouples components from direct dependencies on each other.
-- Allows for flexible system extension without modifying existing code.
-- Simplifies the handling of asynchronous operations.
+Implementation files must export **only** what the spec lists.
 
-## 4. State Management
+---
 
-A centralized state store serves as the single source of truth for application data:
+## 3. Allowed Dependency Flow
 
-- All components read from and write to this store.
-- State changes trigger UI updates automatically.
-- Time-travel debugging is supported for development.
+DataProvider → ParserWorker → StoreSlices
+StoreSlices → UI (via hooks/selectors)
+UI ↔ EventBus (fire & listen)
+UI (Analyzer) → CardinalityEngine (worker)
+UI (Config) → ConfigGenerator
 
-## 5. Performance Optimization
+* No reverse imports (e.g., logic importing UI).  
+* Shared helpers live in `utils/`; they have **zero** external deps.
 
-Performance is considered a core feature:
+---
 
-- Computationally intensive tasks are offloaded to Web Workers.
-- Lazy loading and virtualization are employed for large datasets.
-- Component re-rendering is minimized through memoization and careful state structure.
+## 4. State Isolation (Zustand Slices)
 
-## 6. Progressive Enhancement
+| Slice       | Owns                                | Can read          |
+|-------------|-------------------------------------|-------------------|
+| `metrics`   | ParsedSnapshots, MetricDefs         | none              |
+| `diff`      | Delta / Rate store                  | metrics           |
+| `cardinality` | Counts & attr maps                | metrics           |
+| `ui`        | View selections & panel toggles     | metrics, diff     |
 
-The tool follows a progressive enhancement approach:
+UI components access state **only via selector hooks** (no global getState()).
 
-- Core functionality works with minimal dependencies.
-- Advanced features are added incrementally.
-- Users can derive value regardless of their browser capabilities.
+---
 
-## 7. Accessibility First
+## 5. Event Bus Contract (mitt)
 
-Accessibility is built into the design from the beginning:
+| Channel                     | Payload                                   |
+|-----------------------------|-------------------------------------------|
+| `data.snapshot.loaded`      | `{frame:'A'|'B', snapshot}`               |
+| `ui.metric.select`          | `metricKey:string`                        |
+| `ui.mode.change`            | `'metrics'|'cardinality'`                 |
+| `ui.inspect`                | `metricKey|string`                        |
+| `config.ready`              | `yaml:string`                             |
 
-- WCAG 2.1 AA compliance is targeted.
-- Keyboard navigation is fully supported.
-- Screen readers can interpret all visualizations.
-- Color schemes account for various forms of color blindness.
+*Fire-and-forget:* listeners must not throw; wrap handler in try/catch.
 
-## 8. Error Resilience
+---
 
-The system is designed to be resilient to errors:
+## 6. Worker-First Heavy Lifting
 
-- Component failures are isolated and do not crash the entire application.
-- Error boundaries capture and report issues.
-- Fallback UIs are provided when primary views cannot be rendered.
-- Comprehensive error states guide users toward resolution.
+* Parsing (>2 MB JSON) and cardinality math run in **Web Workers**.
+* Main thread budget: **< 16 ms blocking** per UI action.
+* Shared memory only via structured-clone messages.
 
-## 9. Configuration over Convention
+---
 
-Where appropriate, components are configured explicitly rather than relying on implicit conventions:
+## 7. Performance Guardrails
 
-- Dependencies are injected rather than imported directly.
-- Configuration options are documented and validated.
-- Sensible defaults are provided for all options.
+| Budget                         | Threshold                 |
+|--------------------------------|---------------------------|
+| First Contentful Paint         | < 1.5 s @ 5 MB snapshot   |
+| Bundle (initial, gzip)         | < 200 kB                  |
+| Worker parse time              | < 30 ms / MB              |
+| Re-render on store update      | < 16 ms                   |
 
-## 10. Developer Experience
+Perf CI uses Lighthouse + Vitest benchmarks.
 
-The codebase is optimized for developer productivity:
+---
 
-- Clear documentation is maintained for all components.
-- Type safety is enforced through TypeScript.
-- Code formatting and linting are automated.
-- Tests provide rapid feedback during development.
+## 8. Accessibility & I18n
 
-These principles guide all architectural decisions and should be consulted when designing new components or modifying existing ones.
+* All interactive elements: `role`, `aria-label`.  
+* Color cues always paired with text/ico.  
+* Strings wrapped in `t('key')` for future locale files.
+
+---
+
+## 9. Naming & File Conventions
+
+* Files: `layer-purposeName.ts[x]` (e.g. `ui-GaugeStatCard.tsx`).  
+* Tests: `*.spec.ts`.  
+* Workers: `*.worker.ts`.  
+* Docs: mirror code files (`32-ui-GaugeStatCard.md`).
+
+---
+
+## 10. Testing Doctrine
+
+* 100 % branch coverage on utils & logic.  
+* UI snapshot tests for every micro-component.  
+* Contract tests: ParserWorker ↔ DiffEngine golden JSON.
+
+---
+
+## 11. Versioning & deprecation
+
+* SemVer.  
+* Breaking contract change requires ADR + major bump.  
+* Deprecated events stay one minor cycle with console.warn.
+
+---
+
+Adhering to these principles guarantees:
+
+* **Predictable change-sets** — easy code reviews.  
+* **Swap-ability** — want Svelte instead of React? Replace the UI layer.  
+* **Robust UX** — no parse-time jank, clear error boundaries.
+
+_Questions? Open a discussion referencing this file._
