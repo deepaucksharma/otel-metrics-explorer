@@ -28,13 +28,13 @@ jobs:
         run_install: false
     
     - name: Install dependencies
-      run: pnpm install --no-frozen-lockfile
+      run: pnpm install --no-lockfile
     
     - name: Lint
-      run: pnpm lint || true
-    
+      run: pnpm lint
+
     - name: Test
-      run: pnpm test || true
-    
+      run: pnpm test
+
     - name: Build
-      run: pnpm build || true
+      run: pnpm build
