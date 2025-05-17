@@ -1,0 +1,53 @@
+name: Implementation Task
+description: Implement a defined interface or component
+labels: ["implementation"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Implementation Task"
+  - type: input
+    id: ticket-id
+    attributes:
+      label: Ticket ID
+      description: The ID from the implementation plan (e.g., 1-1b)
+      placeholder: "0-2b"
+    validations:
+      required: true
+  - type: textarea
+    id: implementation-purpose
+    attributes:
+      label: Purpose
+      description: What does this task implement?
+      placeholder: "This task implements..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What criteria must this implementation meet?
+      placeholder: "- [ ] Criterion 1\n- [ ] Criterion 2"
+    validations:
+      required: true
+  - type: textarea
+    id: contract-tests
+    attributes:
+      label: Contract Tests
+      description: What contract tests will be included?
+      placeholder: "The following contract tests will verify the implementation..."
+    validations:
+      required: true
+  - type: input
+    id: estimated-duration
+    attributes:
+      label: Estimated Duration
+      description: Expected time to complete (from implementation plan)
+      placeholder: "0.75d"
+    validations:
+      required: true
+  - type: input
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List of ticket IDs this depends on
+      placeholder: "0-2a, 1-1a"

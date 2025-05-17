@@ -1,0 +1,53 @@
+name: Interface Definition
+description: Define a new interface or contract
+labels: ["interface", "contract"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Interface Definition"
+  - type: input
+    id: ticket-id
+    attributes:
+      label: Ticket ID
+      description: The ID from the implementation plan (e.g., 1-1a)
+      placeholder: "0-2a"
+    validations:
+      required: true
+  - type: textarea
+    id: interface-purpose
+    attributes:
+      label: Purpose
+      description: What does this interface define?
+      placeholder: "This interface defines..."
+    validations:
+      required: true
+  - type: textarea
+    id: interface-details
+    attributes:
+      label: Interface Details
+      description: TypeScript interface definition
+      placeholder: "```typescript\ninterface Example {\n  property: string;\n}\n```"
+    validations:
+      required: true
+  - type: textarea
+    id: mock-implementation
+    attributes:
+      label: Mock Implementation
+      description: How will this interface be mocked?
+      placeholder: "The mock will..."
+    validations:
+      required: true
+  - type: input
+    id: estimated-duration
+    attributes:
+      label: Estimated Duration
+      description: Expected time to complete (from implementation plan)
+      placeholder: "0.5d"
+    validations:
+      required: true
+  - type: input
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List of ticket IDs this depends on
+      placeholder: "0-1, 0-2"

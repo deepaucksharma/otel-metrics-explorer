@@ -1,0 +1,41 @@
+name: Generate Implementation Issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'Implementation phase to generate issues for (0-6)'
+        required: true
+        default: '0'
+        type: choice
+        options:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+
+jobs:
+  generate-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+      
+      - name: Install dependencies
+        run: pnpm install @octokit/rest
+      
+      - name: Generate issues
+        run: node scripts/generate-issues.js ${{ github.event.inputs.phase }} ${{ secrets.GITHUB_TOKEN }}

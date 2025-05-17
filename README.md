@@ -37,28 +37,29 @@ Comprehensive documentation is available in the `/docs` directory:
 
 - [00-Overview.md](/docs/00-Overview.md): Main entry point for understanding the specification
 - [01-Architecture-Principles.md](/docs/01-Architecture-Principles.md): Foundational architecture principles
-- [02-Data-Contracts.md](/docs/02-Data-Contracts.md): Core data structures and type definitions
+- [02-Dependency-Graph.md](/docs/02-Dependency-Graph.md): Single-page overview of allowed import flow
 
 ### Data Provider Layer
 
 - [10-data-StaticFileProvider.md](/docs/10-data-StaticFileProvider.md): Loading OTLP data from static files
-- [11-data-LiveStreamProvider.md](/docs/11-data-LiveStreamProvider.md): Connecting to live OTLP data sources
+- [11-data-LiveWsProvider.md](/docs/11-data-LiveWsProvider.md): Connecting to live OTLP data sources
 
 ### Logic Layer
 
-- [20-logic-OtlpJsonParser.md](/docs/20-logic-OtlpJsonParser.md): Parsing OTLP JSON data
-- [21-logic-CardinalityAnalysisEngine.md](/docs/21-logic-CardinalityAnalysisEngine.md): Analyzing metric cardinality
-- [22-logic-DiffEngine.md](/docs/22-logic-DiffEngine.md): Computing diffs between snapshots
+- [20-logic-ParserWorker.md](/docs/20-logic-ParserWorker.md): Worker that transforms raw OTLP JSON into typed snapshots
+- [21-logic-DiffEngine.md](/docs/21-logic-DiffEngine.md): Computing diffs between snapshots
+- [22-logic-CardinalityEngine.md](/docs/22-logic-CardinalityEngine.md): Set math engine for series and label counts
 
 ### UI Layer
 
-- [30-ui-MetricCard.md](/docs/30-ui-MetricCard.md): Core component for displaying metric data
-- [31-ui-CardinalityAnalysisView.md](/docs/31-ui-CardinalityAnalysisView.md): UI for cardinality analysis
+- [32-ui-GaugeStatCard.md](/docs/32-ui-GaugeStatCard.md): Gauge-style statistic card
+- [33-ui-RateDeltaCard.md](/docs/33-ui-RateDeltaCard.md): Rate/delta display for counters
+- [35-ui-CardinalityOverview.md](/docs/35-ui-CardinalityOverview.md): Cardinality Analyzer overview
 
 ### Shared Utilities
 
-- [40-EventBusService.md](/docs/40-EventBusService.md): Decoupled component communication
-- [41-StateManagementService.md](/docs/41-StateManagementService.md): Centralized state management
+- [40-event-Bus.md](/docs/40-event-Bus.md): Global publish-subscribe hub
+- [41-state-StoreSlices.md](/docs/41-state-StoreSlices.md): Zustand store slices
 
 ### Development & Deployment
 
@@ -72,10 +73,11 @@ Comprehensive documentation is available in the `/docs` directory:
 - [65-error-Handling.md](/docs/65-error-Handling.md): Error handling strategy
 - [66-troubleshooting.md](/docs/66-troubleshooting.md): Common issues and solutions
 
-### Contributing & Planning
+### Project Management & Planning
 
 - [70-adr-Template.md](/docs/70-adr-Template.md): Template for architectural decisions
-- [72-implementation-Plan.md](/docs/72-implementation-Plan.md): Detailed execution plan
+- [72-implementation-Plan.md](/docs/72-implementation-Plan.md): Highly parallelized execution plan with interface-first approach
+- [73-github-Project-Setup.md](/docs/73-github-Project-Setup.md): Using GitHub project management features for tracking implementation
 
 ### Supporting Documentation
 
@@ -102,7 +104,17 @@ See [61-installation-Deployment.md](/docs/61-installation-Deployment.md) for det
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started. Our project follows an interface-first development approach as detailed in [72-implementation-Plan.md](/docs/72-implementation-Plan.md).
+
+## Development Process
+
+Our development process follows these key principles:
+
+1. **Interface-First Development**: We define interfaces and contracts before implementation
+2. **Robust Mocking Strategy**: High-quality mocks enable parallel development
+3. **Contract Tests**: Validate that implementations correctly adhere to interfaces
+
+We use GitHub Projects for task tracking and coordination as described in [73-github-Project-Setup.md](/docs/73-github-Project-Setup.md).
 
 ## License
 
