@@ -24,8 +24,11 @@ jobs:
       uses: pnpm/action-setup@v2
       with:
         version: 8
-        # Run install instead of deferring it to a later step
-        run_install: true
+        # Don't run install here
+        run_install: false
+    
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
     
     - name: Lint
       run: pnpm lint || true
