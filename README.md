@@ -24,12 +24,12 @@ The tool's philosophy is rooted in making the rich OpenTelemetry (OTel) schema t
 
 ## Core Technology Stack
 
-- **Frontend Framework**: React 18 (or Vue 3) with Vite for bundling.
+- **Frontend Framework**: React 18 with Vite for bundling.
 - **State Management**: Zustand (with Immer middleware).
-- **Charting/Visualization**: ECharts (or similar, e.g., Recharts, Nivo).
+- **Charting/Visualization**: ECharts for rich visualizations.
 - **Event Bus**: mitt for decoupled inter-component communication.
 - **Web Workers**: For offloading heavy tasks like JSON parsing and cardinality calculations.
-- **Styling**: Tailwind CSS (or CSS Modules with a utility-first approach).
+- **Styling**: Tailwind CSS for utility-first styling.
 
 ## Documentation
 
@@ -48,6 +48,7 @@ Comprehensive documentation is available in the `/docs` directory:
 
 - [20-logic-OtlpJsonParser.md](/docs/20-logic-OtlpJsonParser.md): Parsing OTLP JSON data
 - [21-logic-CardinalityAnalysisEngine.md](/docs/21-logic-CardinalityAnalysisEngine.md): Analyzing metric cardinality
+- [22-logic-DiffEngine.md](/docs/22-logic-DiffEngine.md): Computing diffs between snapshots
 
 ### UI Layer
 
@@ -59,22 +60,49 @@ Comprehensive documentation is available in the `/docs` directory:
 - [40-EventBusService.md](/docs/40-EventBusService.md): Decoupled component communication
 - [41-StateManagementService.md](/docs/41-StateManagementService.md): Centralized state management
 
+### Development & Deployment
+
+- [60-project-Structure.md](/docs/60-project-Structure.md): Codebase organization and structure
+- [61-installation-Deployment.md](/docs/61-installation-Deployment.md): Setting up and deploying the application
+- [62-user-Guide.md](/docs/62-user-Guide.md): How to use the application effectively
+- [63-api-Reference.md](/docs/63-api-Reference.md): Public APIs for integration
+
+### Error Handling & Troubleshooting
+
+- [65-error-Handling.md](/docs/65-error-Handling.md): Error handling strategy
+- [66-troubleshooting.md](/docs/66-troubleshooting.md): Common issues and solutions
+
+### Contributing & Planning
+
+- [70-adr-Template.md](/docs/70-adr-Template.md): Template for architectural decisions
+- [72-implementation-Plan.md](/docs/72-implementation-Plan.md): Detailed execution plan
+
 ### Supporting Documentation
 
 - [50-SamplePayloads.md](/docs/50-SamplePayloads.md): Example OTLP JSON payloads
 - [51-TestingStrategy.md](/docs/51-TestingStrategy.md): Testing approach and methodology
 
-### Visual Design & Accessibility
-
-- [AA-DesignTokens.md](/docs/AA-DesignTokens.md): Design tokens and accessibility guidelines
-
 ## Getting Started
 
-Instructions for setting up the development environment and running the application will be added as the project progresses.
+```bash
+# Clone the repository
+git clone https://github.com/<org>/otel-metrics-explorer
+cd otel-metrics-explorer
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+```
+
+The app will be available at `http://localhost:5173`
+
+See [61-installation-Deployment.md](/docs/61-installation-Deployment.md) for detailed setup instructions.
 
 ## Contributing
 
-Contribution guidelines will be provided in a future update.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
 
 ## License
 
