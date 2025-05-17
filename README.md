@@ -100,6 +100,13 @@ pnpm dev
 
 The app will be available at `http://localhost:5173`
 
+```bash
+# Start Storybook for isolated component development
+pnpm storybook
+```
+
+Storybook will run at `http://localhost:6006`
+
 See [61-installation-Deployment.md](/docs/61-installation-Deployment.md) for detailed setup instructions.
 
 ## Contributing
