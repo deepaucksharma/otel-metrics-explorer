@@ -2,10 +2,10 @@
  * Script to generate GitHub issues from the implementation plan
  * 
  * Usage:
- * node scripts/generate-issues.js <phase-number> <github-token>
+ * GITHUB_TOKEN=ghp_12345abcdef node scripts/generate-issues.js <phase-number>
  * 
  * Example:
- * node scripts/generate-issues.js 0 ghp_12345abcdef
+ * GITHUB_TOKEN=ghp_12345abcdef node scripts/generate-issues.js 0
  */
 
 import fs from 'fs';
@@ -18,10 +18,10 @@ const IMPLEMENTATION_PLAN_PATH = './docs/72-implementation-Plan.md';
 
 // Parse command line arguments
 const phaseArg = process.argv[2];
-const token = process.argv[3];
+const token = process.env.GITHUB_TOKEN;
 
 if (!phaseArg || !token) {
-  console.error('Usage: node scripts/generate-issues.js <phase-number> <github-token>');
+  console.error('Usage: GITHUB_TOKEN=<token> node scripts/generate-issues.js <phase-number>');
   process.exit(1);
 }
 
