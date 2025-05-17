@@ -22,7 +22,6 @@ export default function Layout({ children }: LayoutProps) {
             <button
               className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700"
               onClick={toggleDarkMode}
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDarkMode ? (
                 <SunIcon className="h-5 w-5" />

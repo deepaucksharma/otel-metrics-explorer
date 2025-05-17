@@ -64,9 +64,6 @@ Comprehensive documentation is available in the `/docs` directory:
 - [50-SamplePayloads.md](/docs/50-SamplePayloads.md): Example OTLP JSON payloads
 - [51-TestingStrategy.md](/docs/51-TestingStrategy.md): Testing approach and methodology
 
-### Visual Design & Accessibility
-
-- [AA-DesignTokens.md](/docs/AA-DesignTokens.md): Design tokens and accessibility guidelines
 
 ## Getting Started
 
