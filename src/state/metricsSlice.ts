@@ -1,14 +1,18 @@
 import type { UIState } from './uiSlice';
 import type { ParsedSnapshot, ParsedMetric } from '../types/otlp';
+import type { MetricDefinition } from '../utils/metricDefinitions';
+import { buildMetricDefinitionsFromSnapshots } from '../utils/metricDefinitions';
 import { StateCreator } from 'zustand';
 
 export interface MetricsSlice {
   snapshots: Record<string, ParsedSnapshot>;
+  metricDefinitions: Record<string, MetricDefinition>;
   addSnapshot: (snapshot: ParsedSnapshot) => void;
   removeSnapshot: (snapshotId: string) => void;
   clearSnapshots: () => void;
   getMetricById: (metricId: string) => ParsedMetric | undefined;
   getMetricsForSnapshot: (snapshotId: string) => ParsedMetric[];
+  getMetricDefinitionByName: (metricName: string) => MetricDefinition | undefined;
 }
 
 export const createMetricsSlice: StateCreator<
@@ -18,13 +22,20 @@ export const createMetricsSlice: StateCreator<
   MetricsSlice
 > = (set, get) => ({
   snapshots: {},
+  metricDefinitions: {},
 
   addSnapshot: (snapshot) => {
     set((state) => {
+      // Add the snapshot
       state.snapshots[snapshot.id] = snapshot;
+      
+      // If no snapshot is selected, select this one
       if (state.uiState.selectedSnapshotId === null) {
         state.uiState.selectedSnapshotId = snapshot.id;
       }
+      
+      // Rebuild metric definitions to include this snapshot
+      state.metricDefinitions = buildMetricDefinitionsFromSnapshots(state.snapshots);
     });
   },
 
@@ -48,12 +59,16 @@ export const createMetricsSlice: StateCreator<
           state.uiState.selectedMetricId = null;
         }
       }
+      
+      // Rebuild metric definitions after removing the snapshot
+      state.metricDefinitions = buildMetricDefinitionsFromSnapshots(state.snapshots);
     });
   },
 
   clearSnapshots: () => {
     set((state) => {
       state.snapshots = {};
+      state.metricDefinitions = {};
       state.uiState.selectedSnapshotId = null;
       state.uiState.comparisonSnapshotId = null;
       state.uiState.selectedMetricId = null;
@@ -74,6 +89,11 @@ export const createMetricsSlice: StateCreator<
     const snapshot = snapshots[snapshotId];
     if (!snapshot) return [];
     return Object.values(snapshot.metrics);
+  },
+  
+  getMetricDefinitionByName: (metricName) => {
+    const { metricDefinitions } = get();
+    return metricDefinitions[metricName];
   },
 });
 

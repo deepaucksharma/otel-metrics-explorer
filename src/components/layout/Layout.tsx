@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { SidebarNavigator } from './SidebarNavigator';
+import { useStore } from '../../services/stateStore';
 
 interface LayoutProps {
   children: ReactNode;
@@ -7,20 +9,21 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { selectedSnapshotId } = useStore(state => state.uiState);
   
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-50 text-neutral-800 dark:text-neutral-800">
-      <header className="sticky top-0 z-10 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-100">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200">
+      <header className="sticky top-0 z-10 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+        <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-xl text-primary-600 dark:text-primary-600">
+            <span className="font-semibold text-xl text-primary-600 dark:text-primary-500">
               OTLP Explorer
             </span>
           </div>
           
           <div className="flex items-center space-x-4">
             <button
-              className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700"
+              className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
               onClick={toggleDarkMode}
               aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
@@ -34,12 +37,20 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
       
-      <main className="container mx-auto py-4">
-        {children}
-      </main>
+      <div className="flex flex-1 h-[calc(100vh-64px)]">
+        {/* Sidebar navigation */}
+        <div className="w-64 border-r border-neutral-200 dark:border-neutral-800 h-full">
+          <SidebarNavigator />
+        </div>
+        
+        {/* Main content area */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
       
-      <footer className="border-t border-neutral-200 dark:border-neutral-700 py-4 mt-8">
-        <div className="container mx-auto px-4 text-center text-neutral-500 dark:text-neutral-400 text-sm">
+      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-3">
+        <div className="px-4 text-center text-neutral-500 dark:text-neutral-500 text-sm">
           OTLP Process Metrics Explorer - Open Source Project
         </div>
       </footer>
