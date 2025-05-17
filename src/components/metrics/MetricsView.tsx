@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../../services/stateStore';
+import { eventBus } from '../../services/eventBus';
 import { GaugeStatCard } from './GaugeStatCard';
+import { DetailPanel } from './DetailPanel';
 import { EmptyState } from '../ui/EmptyState';
 
 export function MetricsView() {
@@ -9,7 +11,25 @@ export function MetricsView() {
     filterText, 
     viewMode, 
     sortBy,
+    selectedMetricId,
   } = useStore(state => state.uiState);
+  
+  const [detailPanelOpen, setDetailPanelOpen] = useState(false);
+  const setSelectedMetric = useStore(state => state.setSelectedMetric);
+  
+  // Handle metric inspection events
+  useEffect(() => {
+    const handleInspectMetric = ({ metricId }: { metricId: string }) => {
+      setSelectedMetric(metricId);
+      setDetailPanelOpen(true);
+    };
+    
+    eventBus.on('ui.inspect', handleInspectMetric);
+    
+    return () => {
+      eventBus.clearEvent('ui.inspect');
+    };
+  }, [setSelectedMetric]);
   
   const metrics = useStore(state => {
     if (!state.uiState.selectedSnapshotId) return [];
@@ -51,6 +71,11 @@ export function MetricsView() {
     });
   }, [metrics, filterText, sortBy]);
 
+  // Close detail panel
+  const handleCloseDetailPanel = () => {
+    setDetailPanelOpen(false);
+  };
+  
   // If no snapshot selected
   if (!selectedSnapshotId) {
     return (
@@ -60,7 +85,7 @@ export function MetricsView() {
         description="Upload an OTLP metrics snapshot to get started."
         actionLabel="Upload Snapshot"
         // This would trigger the file upload in a real implementation
-        onAction={() => {}}
+        onAction={() => eventBus.emit('ui.file.ingest', { trigger: 'empty-state' })}
       />
     );
   }
@@ -80,24 +105,34 @@ export function MetricsView() {
   
   // Render the grid or list based on view mode
   return (
-    <div className="p-4">
-      <div 
-        className={
-          viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
-            : 'space-y-4'
-        }
-      >
-        {filteredMetrics.map(metric => (
-          <div key={metric.id}>
-            <GaugeStatCard
-              metricId={metric.id}
-              snapshotId={selectedSnapshotId}
-              compact={viewMode === 'list'}
-            />
-          </div>
-        ))}
+    <div className="flex h-full">
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div 
+          className={
+            viewMode === 'grid' 
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+              : 'space-y-4'
+          }
+        >
+          {filteredMetrics.map(metric => (
+            <div key={metric.id}>
+              <GaugeStatCard
+                metricId={metric.id}
+                snapshotId={selectedSnapshotId}
+                compact={viewMode === 'list'}
+              />
+            </div>
+          ))}
+        </div>
       </div>
+      
+      {/* Detail Panel */}
+      {detailPanelOpen && selectedMetricId && (
+        <DetailPanel 
+          metricId={selectedMetricId}
+          onClose={handleCloseDetailPanel}
+        />
+      )}
     </div>
   );
 }
