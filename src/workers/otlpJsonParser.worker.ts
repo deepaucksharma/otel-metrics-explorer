@@ -135,17 +135,17 @@ function processResources(
     normalizeAttributes: boolean;
   }
 ): void {
-  // Implementation would process the resources, scopes, and metrics here
-  // This is just a placeholder - a real implementation would be more complex
-  
   // For each resource
   otlpJson.resourceMetrics.forEach((resourceMetric, resourceIndex) => {
     const resourceId = `resource-${resourceIndex}`;
     
+    // Extract resource attributes
+    const resourceAttributes = extractAttributes(resourceMetric.resource.attributes, options.normalizeAttributes);
+    
     // Create parsed resource
     const parsedResource = {
       id: resourceId,
-      attributes: {}, // Would extract attributes from resourceMetric.resource.attributes
+      attributes: resourceAttributes,
       scopes: []
     };
     
@@ -153,12 +153,17 @@ function processResources(
     resourceMetric.scopeMetrics.forEach((scopeMetric, scopeIndex) => {
       const scopeId = `${resourceId}-scope-${scopeIndex}`;
       
+      // Extract scope attributes if present
+      const scopeAttributes = scopeMetric.scope.attributes 
+        ? extractAttributes(scopeMetric.scope.attributes, options.normalizeAttributes)
+        : {};
+      
       // Create parsed scope
       const parsedScope = {
         id: scopeId,
         name: scopeMetric.scope.name,
         version: scopeMetric.scope.version,
-        attributes: {}, // Would extract attributes from scopeMetric.scope.attributes
+        attributes: scopeAttributes,
         metricIds: []
       };
       
@@ -171,6 +176,18 @@ function processResources(
         const temporality = determineTemporality(metric, metricType);
         const monotonic = determineMonotonic(metric, metricType);
         
+        // Extract datapoints based on metric type
+        const dataPoints = extractDataPoints(metric, metricType, options.includeZeroValues);
+        
+        // Collect all unique attribute keys from datapoints
+        const attributeKeysSet = new Set<string>();
+        dataPoints.forEach(dp => {
+          if (dp.attributes) {
+            Object.keys(dp.attributes).forEach(key => attributeKeysSet.add(key));
+          }
+        });
+        const attributeKeys = Array.from(attributeKeysSet);
+        
         // Create parsed metric
         parsedSnapshot.metrics[metricId] = {
           id: metricId,
@@ -180,14 +197,20 @@ function processResources(
           type: metricType,
           temporality,
           monotonic,
-          dataPoints: [], // Would extract data points from the metric
-          attributeKeys: [], // Would extract unique attribute keys
+          dataPoints,
+          attributeKeys,
           resourceIds: [resourceId],
           scopeIds: [scopeId]
         };
         
         // Update counts
         parsedSnapshot.metricCount++;
+        parsedSnapshot.totalDataPoints += dataPoints.length;
+        
+        // Estimate series count - unique combinations of attribute values
+        // For simplicity, we'll use datapoint count as a proxy for now
+        parsedSnapshot.totalSeries += dataPoints.length;
+        
         parsedScope.metricIds.push(metricId);
       });
       
@@ -196,6 +219,142 @@ function processResources(
     
     parsedSnapshot.resources.push(parsedResource);
   });
+}
+
+/**
+ * Extract attributes from KeyValue array into a flat object
+ */
+function extractAttributes(attributes: KeyValue[], normalize: boolean): Record<string, string | number | boolean> {
+  const result: Record<string, string | number | boolean> = {};
+  
+  if (!attributes || !Array.isArray(attributes)) {
+    return result;
+  }
+  
+  attributes.forEach(attr => {
+    const key = normalize ? normalizeAttributeKey(attr.key) : attr.key;
+    const value = extractAttributeValue(attr.value, normalize);
+    
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  });
+  
+  return result;
+}
+
+/**
+ * Extract value from a KeyValue's value field
+ */
+function extractAttributeValue(value: any, normalize: boolean): string | number | boolean | undefined {
+  if (!value) return undefined;
+  
+  if (value.stringValue !== undefined) {
+    return normalize ? normalizeStringValue(value.stringValue) : value.stringValue;
+  }
+  
+  if (value.intValue !== undefined) {
+    return typeof value.intValue === 'string' ? parseInt(value.intValue, 10) : value.intValue;
+  }
+  
+  if (value.doubleValue !== undefined) {
+    return value.doubleValue;
+  }
+  
+  if (value.boolValue !== undefined) {
+    return value.boolValue;
+  }
+  
+  // For complex types, we stringify them
+  if (value.arrayValue || value.kvlistValue) {
+    return JSON.stringify(value);
+  }
+  
+  return undefined;
+}
+
+/**
+ * Normalize attribute keys
+ */
+function normalizeAttributeKey(key: string): string {
+  return key.trim().toLowerCase();
+}
+
+/**
+ * Normalize string values
+ */
+function normalizeStringValue(value: string): string {
+  return value.trim();
+}
+
+/**
+ * Extract data points based on metric type
+ */
+function extractDataPoints(metric: any, type: MetricType, includeZeroValues: boolean): any[] {
+  const dataPoints = [];
+  
+  if (type === 'gauge' && metric.gauge?.dataPoints) {
+    for (const dp of metric.gauge.dataPoints) {
+      const value = dp.asDouble !== undefined ? dp.asDouble : 
+                    dp.asInt !== undefined ? parseInt(dp.asInt, 10) : 0;
+      
+      if (!includeZeroValues && value === 0) continue;
+      
+      dataPoints.push({
+        attributes: extractAttributes(dp.attributes, true),
+        timeUnixNano: dp.timeUnixNano,
+        startTimeUnixNano: dp.startTimeUnixNano,
+        value
+      });
+    }
+  } else if (type === 'sum' && metric.sum?.dataPoints) {
+    for (const dp of metric.sum.dataPoints) {
+      const value = dp.asDouble !== undefined ? dp.asDouble : 
+                    dp.asInt !== undefined ? parseInt(dp.asInt, 10) : 0;
+      
+      if (!includeZeroValues && value === 0) continue;
+      
+      dataPoints.push({
+        attributes: extractAttributes(dp.attributes, true),
+        timeUnixNano: dp.timeUnixNano,
+        startTimeUnixNano: dp.startTimeUnixNano,
+        value
+      });
+    }
+  } else if (type === 'histogram' && metric.histogram?.dataPoints) {
+    for (const dp of metric.histogram.dataPoints) {
+      const count = typeof dp.count === 'string' ? parseInt(dp.count, 10) : dp.count;
+      
+      if (!includeZeroValues && count === 0) continue;
+      
+      dataPoints.push({
+        attributes: extractAttributes(dp.attributes, true),
+        timeUnixNano: dp.timeUnixNano,
+        startTimeUnixNano: dp.startTimeUnixNano,
+        count,
+        sum: dp.sum,
+        bucketCounts: dp.bucketCounts?.map(c => typeof c === 'string' ? parseInt(c, 10) : c),
+        explicitBounds: dp.explicitBounds
+      });
+    }
+  } else if (type === 'summary' && metric.summary?.dataPoints) {
+    for (const dp of metric.summary.dataPoints) {
+      const count = typeof dp.count === 'string' ? parseInt(dp.count, 10) : dp.count;
+      
+      if (!includeZeroValues && count === 0) continue;
+      
+      dataPoints.push({
+        attributes: extractAttributes(dp.attributes, true),
+        timeUnixNano: dp.timeUnixNano,
+        startTimeUnixNano: dp.startTimeUnixNano,
+        count,
+        sum: dp.sum,
+        quantileValues: dp.quantileValues
+      });
+    }
+  }
+  
+  return dataPoints;
 }
 
 /**

@@ -1,0 +1,184 @@
+{
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sample-service"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "1.0.0"
+            }
+          },
+          {
+            "key": "deployment.environment",
+            "value": {
+              "stringValue": "development"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "scope": {
+            "name": "io.opentelemetry.runtime",
+            "version": "1.0.0"
+          },
+          "metrics": [
+            {
+              "name": "system.cpu.usage",
+              "description": "CPU usage",
+              "unit": "percent",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "cpu",
+                        "value": {
+                          "stringValue": "cpu0"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asDouble": 45.5
+                  },
+                  {
+                    "attributes": [
+                      {
+                        "key": "cpu",
+                        "value": {
+                          "stringValue": "cpu1"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asDouble": 32.1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "system.memory.usage",
+              "description": "Memory usage",
+              "unit": "bytes",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "state",
+                        "value": {
+                          "stringValue": "used"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asDouble": 2147483648
+                  },
+                  {
+                    "attributes": [
+                      {
+                        "key": "state",
+                        "value": {
+                          "stringValue": "free"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asDouble": 4294967296
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "io.opentelemetry.app",
+            "version": "0.1.0"
+          },
+          "metrics": [
+            {
+              "name": "app.requests.count",
+              "description": "Number of requests",
+              "unit": "{requests}",
+              "sum": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "endpoint",
+                        "value": {
+                          "stringValue": "/api/users"
+                        }
+                      },
+                      {
+                        "key": "method",
+                        "value": {
+                          "stringValue": "GET"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asInt": "128"
+                  },
+                  {
+                    "attributes": [
+                      {
+                        "key": "endpoint",
+                        "value": {
+                          "stringValue": "/api/users"
+                        }
+                      },
+                      {
+                        "key": "method",
+                        "value": {
+                          "stringValue": "POST"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "asInt": "32"
+                  }
+                ],
+                "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE",
+                "isMonotonic": true
+              }
+            },
+            {
+              "name": "app.request.duration",
+              "description": "Request duration",
+              "unit": "ms",
+              "histogram": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "endpoint",
+                        "value": {
+                          "stringValue": "/api/users"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1640995200000000000",
+                    "count": "100",
+                    "sum": 5000.0,
+                    "bucketCounts": ["10", "25", "35", "20", "10"],
+                    "explicitBounds": [10, 50, 100, 500]
+                  }
+                ],
+                "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
