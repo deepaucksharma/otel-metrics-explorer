@@ -41,7 +41,7 @@ jobs:
           run_install: false
       
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile @octokit/rest
+        run: pnpm install --no-lockfile @octokit/rest
       
       - name: Debug Implementation Plan structure
         run: |
@@ -52,6 +52,6 @@ jobs:
           grep -n "### Phase" docs/72-implementation-Plan.md || echo "No matches for ### Phase"
       
       - name: Generate issues
-        run: node scripts/generate-issues.js ${{ github.event.inputs.phase }} ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/generate-issues.js ${{ github.event.inputs.phase }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

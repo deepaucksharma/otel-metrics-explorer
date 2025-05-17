@@ -47,7 +47,7 @@ otlp-metrics-explorer/
 │   ├── integration/            # Integration tests
 │   ├── e2e/                    # End-to-end tests (Cypress)
 │   └── fixtures/               # Test fixtures and mock data
-├── .eslintrc.js                # ESLint configuration
+├── eslint.config.cjs           # ESLint configuration
 ├── .prettierrc                 # Prettier configuration
 ├── cypress.json                # Cypress configuration
 ├── index.html                  # HTML entry point

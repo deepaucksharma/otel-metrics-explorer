@@ -60,7 +60,7 @@ Legend
 
 ## 3. Import Rules (ESLint plugin)
 
-Create `.eslintrc` rule:
+Create `eslint.config.cjs` rule:
 
 ```json
 {
