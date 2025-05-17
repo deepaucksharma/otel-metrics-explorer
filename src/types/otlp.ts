@@ -79,6 +79,7 @@ export interface DataPoint {
   startTimeUnixNano?: string;
   asDouble?: number;
   asInt?: string;
+  seriesKey?: string;
 }
 
 export interface HistogramDataPoint {
@@ -90,6 +91,7 @@ export interface HistogramDataPoint {
   bucketCounts?: string[];
   explicitBounds?: number[];
   exemplars?: Exemplar[];
+  seriesKey?: string;
 }
 
 export interface SummaryDataPoint {
@@ -99,6 +101,7 @@ export interface SummaryDataPoint {
   count: string;
   sum: number;
   quantileValues: QuantileValue[];
+  seriesKey?: string;
 }
 
 export interface QuantileValue {
